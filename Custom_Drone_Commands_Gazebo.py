@@ -1,7 +1,6 @@
 from pymavlink import mavutil
 import math
 import tkinter as tk
-import MVC
 
 def get_distance_global(current_lat, current_lon, target_lat, target_lon):
     #return the distance between current position and target position in centimeters
@@ -58,9 +57,9 @@ def send_waypoint_local(connection, x, y, alt):
                      int(0b010111111000), x, y, alt,
                       0, 0, 0, 0, 0, 0, 0, 0))
 
-    while 1:
-        msg = connection.recv_match(type = 'LOCAL_POS', blocking = True)
-        print(msg)
+    #while 1:
+    #    msg = connection.recv_match(type = 'LOCAL_POS', blocking = True)
+    #    print(msg)
 
 #send global gps coordinates and altitude, and have copter fly over that spot. 
 def send_waypoint_global(connection, lat, lon, alt):
@@ -82,15 +81,9 @@ def send_waypoint_global(connection, lat, lon, alt):
             print("target waypoint reached")
             break
 
-
-#Main code:
-root = tk.Tk()
-app = MVC.Controller(root)
-root.mainloop()
-planArr = MVC.Controller.planArr
-
+#Example usage:
+        
 # drone_connection = connect(14551)
-
 # takeoff(drone_connection, 3)
 # msg = drone_connection.recv_match(type = 'GLOBAL_POSITION_INT', blocking = True) #wait for a message containing global position coordinates and grab the lat and lon of the takeoff location.
 # home_lat = msg.lat

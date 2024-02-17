@@ -4,6 +4,8 @@
 
 from pymavlink import mavutil
 from Custom_Mocap_Commands import *
+from Custom_Drone_Commands import *
+from Custom_Drone_Commands_Gazebo import *
 import time
 import threading
 
@@ -15,16 +17,18 @@ class mocap_streaming_thread(threading.Thread):
         self.thread_ID = thread_ID
         self.mocap_connection = mocap_connection
         self.init_time = init_time
+        self.wand_pos = None
+        self.wand_rot = None
 
     def run(self):
         while True:
             time.sleep(.1)
 
-            [wand_pos, wand_rot] = self.mocap_connection.rigid_body_dict[2]
+            [self.wand_pos, self.wand_rot] = self.mocap_connection.rigid_body_dict[2]
 
-            print(f"Current y (m): {wand_pos[1]}")
-            print(f"Current z (m): {wand_pos[0]}")
-            print(f"Current x (m): {wand_pos[2]}")
+            #print(f"Current y (m): {self.wand_pos[1]}")
+            #print(f"Current z (m): {self.wand_pos[0]}")
+            #print(f"Current x (m): {self.wand_pos[2]}")
 
 
         return
@@ -39,4 +43,12 @@ is_running = streaming_client.run()
 
 stream = mocap_streaming_thread("stream1", 1, streaming_client, init_time)
 stream.start()
+
+drone_connection = connect(14551)
+takeoff(drone_connection, 1)
 time.sleep(5)
+
+while(is_running):
+    print(f"current pos (m): {stream.wand_pos}")
+    send_waypoint_local(drone_connection, 5 * stream.wand_pos[2], -5 * stream.wand_pos[0], -1 * stream.wand_pos[1])
+    time.sleep(.5)
